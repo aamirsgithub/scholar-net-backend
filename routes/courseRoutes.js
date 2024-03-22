@@ -75,4 +75,22 @@ router.get("/api/fetch-all-courses", isAuthenticated, async (req, res) => {
   }
 });
 
+router.get("/api/fetch-single-course/:courseId", isAuthenticated, async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const course = await Course.findById(courseId);
+
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    res.json(course);
+  } catch (error) {
+    console.error("Error fetching course by ID:", error);
+    res
+      .status(500)
+      .json({ message: "Error fetching course", error: error.message });
+  }
+});
+
 module.exports = router;
