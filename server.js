@@ -11,10 +11,13 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const postRoutes = require("./routes/postRoutes");
 const courseRoutes = require("./routes/courseRoutes");
+const zoomRoutes = require("./routes/zoomRoutes");
+const instructorRoutes = require("./routes/instructorRoutes");
 const MongoStore = require("connect-mongo");
 const PORT = process.env.PORT;
 
-app.use('/uploads', express.static('uploads'));
+app.use("/uploads", express.static("uploads"));
+app.use(express.static('public'));
 
 
 app.use(express.json());
@@ -49,7 +52,9 @@ app.use(passport.session());
 app.use(authRoutes);
 app.use(userRoutes);
 app.use(postRoutes);
-app.use(courseRoutes)
+app.use(courseRoutes);
+app.use(zoomRoutes);
+app.use(instructorRoutes);
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -63,7 +68,6 @@ passport.deserializeUser(async (id, done) => {
     done(err, null);
   }
 });
-
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);

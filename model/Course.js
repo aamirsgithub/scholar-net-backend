@@ -12,11 +12,10 @@ const courseContentSchema = new mongoose.Schema({
     required: true,
   },
   video: {
-    type: String, // Store the path or URL to the video
-    required: true, // Make it optional as not all content might have a video
+    type: String,
+    // required: true,
   },
 });
-
 
 const courseSchema = new Schema(
   {

@@ -63,7 +63,7 @@ router.post(
   }
 );
 
-router.get("/api/fetch-all-courses", isAuthenticated, async (req, res) => {
+router.get("/api/fetch-all-courses", async (req, res) => {
   try {
     const courses = await Course.find();
     res.json(courses);
