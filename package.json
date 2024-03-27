@@ -27,6 +27,7 @@
     "passport-google-oauth2": "^0.2.0",
     "passport-local": "^1.0.0",
     "query-string": "^9.0.0",
+    "stripe": "^14.22.0",
     "zoomus-jssdk": "^1.7.1"
   },
   "devDependencies": {

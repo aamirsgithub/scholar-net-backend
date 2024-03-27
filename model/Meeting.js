@@ -4,10 +4,10 @@ const ObjectId = Schema.Types.ObjectId;
 
 const meetingSchema = new Schema(
   {
-    courseId: {
+    InstructorId: {
       type: ObjectId,
       required: true,
-      ref: "Course",
+      ref: "InstructorProfile",
     },
     zoomMeetingId: String,
     topic: String,

@@ -3,7 +3,7 @@ const { createZoomMeeting } = require('../utils/zoomHelpers');
 const Meeting = require('../model/Meeting');
 
 exports.startMeeting = async (req, res) => {
-    const { courseId } = req.body; // Extracting courseId from the request body
+    const { InstructorId } = req.body; 
 
     // Proceed with creating the Zoom meeting
     const meetingDetails = {
@@ -15,7 +15,7 @@ exports.startMeeting = async (req, res) => {
     
     if (meetingResponse) {
         const newMeeting = new Meeting({
-            courseId, // Associate the meeting with the provided courseId
+            InstructorId, 
             zoomMeetingId: meetingResponse.id,
             topic: meetingResponse.topic,
             startUrl: meetingResponse.start_url,

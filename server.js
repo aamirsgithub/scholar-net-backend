@@ -13,6 +13,7 @@ const postRoutes = require("./routes/postRoutes");
 const courseRoutes = require("./routes/courseRoutes");
 const zoomRoutes = require("./routes/zoomRoutes");
 const instructorRoutes = require("./routes/instructorRoutes");
+const purchaseCourseRoutes = require("./routes/purchaseCourseRoutes");
 const MongoStore = require("connect-mongo");
 const PORT = process.env.PORT;
 
@@ -55,6 +56,7 @@ app.use(postRoutes);
 app.use(courseRoutes);
 app.use(zoomRoutes);
 app.use(instructorRoutes);
+app.use(purchaseCourseRoutes);
 
 passport.serializeUser((user, done) => {
   done(null, user.id);

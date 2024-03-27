@@ -49,24 +49,26 @@ router.post(
 );
 
 // Additional routes as needed for fetching instructor profile data
-module.exports = router;
-
 
 // Route to get the current instructor's profile
 router.get("/api/instructor/profile", isAuthenticated, async (req, res) => {
   const { _id: userId } = req.user;
 
   try {
-      const profile = await InstructorProfile.findOne({ user: userId }).populate('user', 'username email'); // Optionally populate fields from the User model if needed
+    const profile = await InstructorProfile.findOne({ user: userId }).populate(
+      "user",
+      "username email"
+    ); // Optionally populate fields from the User model if needed
 
-      if (!profile) {
-          return res.status(404).json({ message: "Instructor profile not found" });
-      }
+    if (!profile) {
+      return res.status(404).json({ message: "Instructor profile not found" });
+    }
 
-      res.status(201).json(profile);
+    res.status(201).json(profile);
   } catch (error) {
-      console.error("Error fetching instructor profile:", error);
-      res.status(500).json({ message: "Server error" });
+    console.error("Error fetching instructor profile:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
+module.exports = router;

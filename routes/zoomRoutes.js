@@ -1,15 +1,3 @@
-// const express = require("express");
-// const isAuthenticated = require("../middleware/auth");
-// // At the top with other imports
-// const { generateSignature } = require('../utils/zoomUtils');
-
-// // Adding a route for generating a Zoom signature
-// app.post('/api/zoom/signature',isAuthenticated, (req, res) => {
-//     const { meetingNumber, role } = req.body;
-//     const signature = generateSignature(process.env.ZOOM_SDK_KEY, process.env.ZOOM_SDK_SECRET, meetingNumber, role.toString());
-//     res.json({ signature });
-// });
-
 const express = require("express");
 const router = express.Router();
 const zoomController = require("../controller/zoomController");
@@ -19,10 +7,10 @@ const Meeting = require("../model/Meeting");
 router.post("/api/zoom/start-meeting", zoomController.startMeeting);
 
 // Route to get meeting details by courseId
-router.get("/api/zoom/meeting-details/:courseId", async (req, res) => {
-  const { courseId } = req.params;
+router.post("/api/zoom/meeting-details", async (req, res) => {
+  const { instructorId } = req.body;
   try {
-    const meeting = await Meeting.findOne({ courseId: courseId });
+    const meeting = await Meeting.findOne({ InstructorId: instructorId });
     if (meeting) {
       res.json(meeting);
     } else {
@@ -33,5 +21,27 @@ router.get("/api/zoom/meeting-details/:courseId", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
+
+// Route to fetch meeting details by instructorId, received in the request body
+router.post("/api/zoom/meeting-details", async (req, res) => {
+  const { instructorId } = req.body; // Ensure this matches the case used in the frontend request
+
+  try {
+    const meeting = await Meeting.findOne({ instructor: instructorId }); // Adjust this if your Meeting model's field name differs
+    if (meeting) {
+      // Respond with the meeting details
+      res.json(meeting);
+    } else {
+      // If no meeting is found, send a 404 response
+      res.status(404).send("Meeting not found.");
+    }
+  } catch (error) {
+    console.error("Failed to fetch meeting details:", error);
+    // Handle server errors
+    res.status(500).send("Server error");
+  }
+});
+
 
 module.exports = router;
