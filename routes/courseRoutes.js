@@ -19,11 +19,11 @@ router.post(
   ]),
   async (req, res) => {
     try {
-      console.log(
-        "Content type console log",
-        typeof req.body.content,
-        req.body.content
-      );
+      // console.log(
+      //   "Content type console log",
+      //   typeof req.body.content,
+      //   req.body.content
+      // );
       let content = [];
       if (typeof req.body.content === "string") {
         content = JSON.parse(req.body.content);
@@ -78,7 +78,7 @@ router.get("/api/fetch-all-courses", async (req, res) => {
 router.get("/api/fetch-single-course/:courseId", isAuthenticated, async (req, res) => {
   try {
     const { courseId } = req.params;
-    const course = await Course.findById(courseId);
+    const course = await Course.findById(courseId).populate('course_creator'); // Ensure 'course_creator' corresponds to the correct reference field name
 
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
@@ -87,10 +87,7 @@ router.get("/api/fetch-single-course/:courseId", isAuthenticated, async (req, re
     res.json(course);
   } catch (error) {
     console.error("Error fetching course by ID:", error);
-    res
-      .status(500)
-      .json({ message: "Error fetching course", error: error.message });
+    res.status(500).json({ message: "Error fetching course", error: error.message });
   }
 });
-
 module.exports = router;

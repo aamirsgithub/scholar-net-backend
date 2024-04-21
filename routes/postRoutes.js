@@ -13,7 +13,7 @@ router.post("/api/createpost", upload.single("file"), async (req, res) => {
 
       cloudinary.uploader.upload(req.file.path, async function (err, result) {
         if (err) {
-          console.log(err);
+          // console.log(err);
           return res.status(500).json({
             success: false,
             message: "Error",

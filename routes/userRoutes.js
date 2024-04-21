@@ -1,7 +1,9 @@
 const express = require("express");
 const isAuthenticated = require("../middleware/auth");
-const userdb = require("../model/User");
 const router = express.Router();
+const StudentProfile = require("../model/StudentProfile");
+const upload = require("../middleware/multer");
+const userdb = require("../model/User");
 const bcrypt = require("bcryptjs");
 
 router.post("/simple-signup", async (req, res) => {
@@ -38,9 +40,9 @@ router.get("/signup/details", async (req, res) => {
       const userInDatabase = await userdb.findOne({
         googleId: userFromGoogle.googleId,
       });
-      console.log("user from google :", userFromGoogle);
-      console.log("--------------");
-      console.log("user from DB :", userInDatabase);
+      // console.log("user from google :", userFromGoogle);
+      // console.log("--------------");
+      // console.log("user from DB :", userInDatabase);
 
       if (userInDatabase) {
         res.status(200).json({
@@ -99,6 +101,75 @@ router.post("/signup-proceed", async (req, res) => {
   } catch (error) {
     console.error("Error during signup:", error);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+
+
+
+// Route to create or update an student profile
+router.post(
+  "/api/student/profile",
+  isAuthenticated,
+  upload.single("image"),
+  async (req, res) => {
+    const { _id: userId } = req.user;
+
+    // console.log("Body fields:", req.body);
+    // console.log("File fields:", req.files);
+
+    // const { userId } = req.user;
+    const profileData = { ...req.body, user: userId };
+
+    if (req.file) {
+      profileData.image = req.file.path; // Include the path of the uploaded image
+    }
+
+    try {
+      // Check if profile already exists for user
+      let profile = await StudentProfile.findOne({ user: userId });
+
+      if (profile) {
+        // Update existing profile
+        profile = await StudentProfile.findOneAndUpdate(
+          { user: userId },
+          { $set: profileData },
+          { new: true }
+        );
+      } else {
+        // Create new profile
+        profile = new StudentProfile(profileData);
+        await profile.save();
+      }
+
+      res.status(201).json(profile);
+    } catch (error) {
+      console.error("Error with student profile:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  }
+);
+
+// Additional routes as needed for fetching student profile data
+
+// Route to get the current student's profile
+router.get("/api/student/profile", isAuthenticated, async (req, res) => {
+  const { _id: userId } = req.user;
+
+  try {
+    const profile = await StudentProfile.findOne({ user: userId }).populate(
+      "user",
+      "username email"
+    ); // Optionally populate fields from the User model if needed
+
+    if (!profile) {
+      return res.status(404).json({ message: "student profile not found" });
+    }
+
+    res.status(201).json(profile);
+  } catch (error) {
+    console.error("Error fetching student profile:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

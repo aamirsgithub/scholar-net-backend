@@ -1,9 +1,9 @@
-// models/InstructorProfile.js
+// models/StudentProfile.js
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 
-const instructorProfileSchema = new mongoose.Schema(
+const studentProfileSchema = new mongoose.Schema(
   {
     user: {
       type: ObjectId,
@@ -21,15 +21,15 @@ const instructorProfileSchema = new mongoose.Schema(
     city: String,
     state: String,
     // zip: String,
-    courseCategory: String,
+    // courseCategory: String,
     language: String,
     image: String,
   },
   { timestamps: true }
 );
 
-const InstructorProfile = mongoose.model(
-  "InstructorProfile",
-  instructorProfileSchema
+const StudentProfile = mongoose.model(
+  "StudentProfile",
+  studentProfileSchema
 );
-module.exports = InstructorProfile;
+module.exports = StudentProfile;

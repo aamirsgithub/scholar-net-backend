@@ -1,4 +1,3 @@
-// routes/instructorRoutes.js
 const express = require("express");
 const router = express.Router();
 const InstructorProfile = require("../model/InstructorProfile");
@@ -13,8 +12,8 @@ router.post(
   async (req, res) => {
     const { _id: userId } = req.user;
 
-    console.log("Body fields:", req.body);
-    console.log("File fields:", req.files);
+    // console.log("Body fields:", req.body);
+    // console.log("File fields:", req.files);
 
     // const { userId } = req.user;
     const profileData = { ...req.body, user: userId };
