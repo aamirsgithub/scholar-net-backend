@@ -230,6 +230,8 @@ async function getPurchasedCourses(userId) {
       }),
       image: `http://localhost:5000/${course.image.replace(/\\/g, "/")}`,
       course_creator: course.course_creator.displayName,
+      instructor_name: course.instructor_name,
+      instructor_email: course.instructor_email,
       createdAt: course.createdAt,
       updatedAt: course.updatedAt,
       __v: course.__v,
@@ -289,6 +291,8 @@ router.get(
           ? `http://localhost:5000/${course.image.replace(/\\/g, "/")}`
           : null,
         course_creator: course.course_creator.displayName,
+        instructor_name: course.instructor_name,
+        instructor_email: course.instructor_email,
         createdAt: course.createdAt,
         updatedAt: course.updatedAt,
         __v: course.__v,
