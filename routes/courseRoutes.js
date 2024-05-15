@@ -65,6 +65,7 @@ function extractAndTranscribeAudio(videoPath, outputPath, apiKey) {
   });
 }
 
+
 router.post("/api/extract-audio", upload.single("video"), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: "No video file provided" });
@@ -91,7 +92,6 @@ router.post("/api/extract-audio", upload.single("video"), async (req, res) => {
       hasProfanity: profanityCheck.hasProfanity,
       filteredText: profanityCheck.filteredText,
     });
-
   } catch (error) {
     console.error("Failed operation: ", error);
     res.status(500).json({ message: error });
@@ -110,6 +110,10 @@ router.post(
     { name: "content[4][video]", maxCount: 1 },
     { name: "content[5][video]", maxCount: 1 },
     { name: "content[6][video]", maxCount: 1 },
+    { name: "content[7][video]", maxCount: 1 },
+    { name: "content[8][video]", maxCount: 1 },
+    { name: "content[9][video]", maxCount: 1 },
+    { name: "content[10][video]", maxCount: 1 },
   ]),
   async (req, res) => {
     try {
@@ -121,11 +125,10 @@ router.post(
       }
 
       content.forEach((item, index) => {
-        // Attempt to assign video paths to corresponding content items
         const videoField = `content[${index}][video]`;
         if (req.files[videoField]) {
-          const videoFile = req.files[videoField][0]; // Assuming maxCount is 1
-          item.video = videoFile.path; // Add video path to content item
+          const videoFile = req.files[videoField][0];
+          item.video = videoFile.path;
         }
       });
 
