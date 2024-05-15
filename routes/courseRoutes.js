@@ -140,6 +140,8 @@ router.post(
         actual_price: parseFloat(req.body.actual_price),
         discounted_price: parseFloat(req.body.discounted_price),
         course_creator: req.user._id,
+        instructor_name: req.user.displayName,
+        instructor_email: req.user.email,
       };
 
       // Create and save the course instance

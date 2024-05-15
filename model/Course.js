@@ -33,6 +33,14 @@ const courseSchema = new Schema(
       ref: "User",
       required: true,
     },
+    instructor_name: {  
+      type: String,
+      required: true
+    },
+    instructor_email: {  
+      type: String,
+      required: true
+    }
   },
   {
     timestamps: true,
