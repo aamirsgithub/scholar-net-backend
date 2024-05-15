@@ -1,14 +1,16 @@
 const express = require("express");
-const Course = require("../model/Course");
+const mongoose = require("mongoose");
 const router = express.Router();
 const upload = require("../middleware/multer");
 const isAuthenticated = require("../middleware/auth");
-const ffmpeg = require("fluent-ffmpeg");
+const Transaction = require("../model/Transaction");
+const Course = require("../model/Course");
 // const fs = require("fs");
+const ffmpeg = require("fluent-ffmpeg"); // convert video to audio
 ffmpeg.setFfmpegPath("C:\\FFmpeg\\bin\\ffmpeg.exe");
 ffmpeg.setFfprobePath("C:\\FFmpeg\\bin\\ffprobe.exe");
-const AssemblyAI = require("assemblyai").AssemblyAI;
-const Filter = require("bad-words");
+const AssemblyAI = require("assemblyai").AssemblyAI; // convert audio to text
+const Filter = require("bad-words"); // detects profanity/badwordss
 
 const filter = new Filter();
 
@@ -64,7 +66,6 @@ function extractAndTranscribeAudio(videoPath, outputPath, apiKey) {
       .run();
   });
 }
-
 
 router.post("/api/extract-audio", upload.single("video"), async (req, res) => {
   if (!req.file) {
@@ -188,4 +189,117 @@ router.get(
     }
   }
 );
+
+async function getPurchasedCourses(userId) {
+  // Fetch transactions where status is 'completed'
+  const transactions = await Transaction.find({ userId, status: "completed" });
+
+  // Extract course IDs from transactions
+  const courseIds = transactions.flatMap((t) =>
+    t.items.map((item) => item.courseId)
+  );
+
+  // Fetch course details for the extracted IDs
+  const courses = await Course.find({ _id: { $in: courseIds } }).populate(
+    "course_creator",
+    "displayName"
+  );
+
+  return courses.map((course) => {
+    return {
+      _id: course._id,
+      category: course.category,
+      course_name: course.course_name,
+      description: course.description,
+      language: course.language,
+      actual_price: course.actual_price,
+      discounted_price: course.discounted_price,
+      what_you_will_learn: course.what_you_will_learn,
+      content: course.content.map((contentItem) => {
+        return {
+          title: contentItem.title,
+          description: contentItem.description,
+          video: `http://localhost:5000/${contentItem.video.replace(
+            /\\/g,
+            "/"
+          )}`,
+          _id: contentItem._id,
+        };
+      }),
+      image: `http://localhost:5000/${course.image.replace(/\\/g, "/")}`,
+      course_creator: course.course_creator.displayName,
+      createdAt: course.createdAt,
+      updatedAt: course.updatedAt,
+      __v: course.__v,
+    };
+  });
+}
+
+router.get(
+  "/api/purchased-courses/:userId",
+  isAuthenticated,
+  async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const purchasedCourses = await getPurchasedCourses(userId);
+      res.json(purchasedCourses);
+    } catch (error) {
+      console.error("Failed to fetch purchased courses", error);
+      res.status(500).send("Internal server error");
+    }
+  }
+);
+
+router.get(
+  "/api/instructor-courses/:instructorId",
+  isAuthenticated,
+  async (req, res) => {
+    const { instructorId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(instructorId)) {
+      return res.status(400).json({ message: "Invalid instructor ID" });
+    }
+
+    try {
+      const objectIdInstructorId = new mongoose.Types.ObjectId(instructorId);
+      const courses = await Course.find({
+        course_creator: objectIdInstructorId,
+      }).populate("course_creator", "displayName");
+
+      const formattedCourses = courses.map((course) => ({
+        _id: course._id,
+        category: course.category,
+        course_name: course.course_name,
+        description: course.description,
+        language: course.language,
+        actual_price: course.actual_price,
+        discounted_price: course.discounted_price,
+        what_you_will_learn: course.what_you_will_learn,
+        content: course.content.map((contentItem) => ({
+          title: contentItem.title,
+          description: contentItem.description,
+          video: contentItem.video
+            ? `http://localhost:5000/${contentItem.video.replace(/\\/g, "/")}`
+            : null,
+          _id: contentItem._id,
+        })),
+        image: course.image
+          ? `http://localhost:5000/${course.image.replace(/\\/g, "/")}`
+          : null,
+        course_creator: course.course_creator.displayName,
+        createdAt: course.createdAt,
+        updatedAt: course.updatedAt,
+        __v: course.__v,
+      }));
+
+      res.json(formattedCourses);
+    } catch (error) {
+      console.error("Error fetching instructor's courses:", error);
+      res
+        .status(500)
+        .json({ message: "Error fetching courses", error: error.message });
+    }
+  }
+);
+
 module.exports = router;
