@@ -35,11 +35,11 @@ const courseSchema = new Schema(
     },
     instructor_name: {
       type: String,
-      required: true,
+      // required: true,
     },
     instructor_email: {
       type: String,
-      required: true,
+      // required: true,
     },
     rating_count: {
       type: Number,
