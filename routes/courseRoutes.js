@@ -291,6 +291,7 @@ router.get(
           ? `http://localhost:5000/${course.image.replace(/\\/g, "/")}`
           : null,
         course_creator: course.course_creator.displayName,
+        // instructor_id: course.course_creator._id,
         instructor_name: course.instructor_name,
         instructor_email: course.instructor_email,
         createdAt: course.createdAt,
@@ -304,6 +305,28 @@ router.get(
       res
         .status(500)
         .json({ message: "Error fetching courses", error: error.message });
+    }
+  }
+);
+
+router.delete(
+  "/api/delete-course/:courseId/:instructorId",
+  isAuthenticated,
+  async (req, res) => {
+    try {
+      const { courseId, instructorId } = req.params;
+
+      await Course.findOneAndDelete({
+        _id: courseId,
+        course_creator: instructorId,
+      });
+
+      res.status(200).json({ message: "Course deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting course:", error);
+      res
+        .status(500)
+        .json({ message: "Error deleting course", error: error.message });
     }
   }
 );
