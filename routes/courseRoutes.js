@@ -331,4 +331,47 @@ router.delete(
   }
 );
 
+
+router.post("/api/courses/:id/rating", async (req, res) => {
+  const courseId = req.params.id;
+  const { rating } = req.body;
+
+  try {
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    course.rating_count += 1;
+    course.rating_star = (course.rating_star * (course.rating_count - 1) + rating) / course.rating_count;
+
+    await course.save();
+
+    res.status(200).json({ message: "Rating submitted successfully" });
+  } catch (error) {
+    console.error("Error submitting rating:", error);
+    res.status(500).json({ message: "Failed to submit rating" });
+  }
+});
+
+
+// Backend API to get the rating of a course
+router.get("/api/courses/:id/rating", async (req, res) => {
+  const courseId = req.params.id;
+
+  try {
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    res.status(200).json({ rating: course.rating_star });
+  } catch (error) {
+    console.error("Error fetching rating:", error);
+    res.status(500).json({ message: "Failed to fetch rating" });
+  }
+});
+
+
+
 module.exports = router;

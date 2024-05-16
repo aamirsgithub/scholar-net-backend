@@ -41,6 +41,14 @@ const courseSchema = new Schema(
       type: String,
       required: true,
     },
+    rating_count: {
+      type: Number,
+      default: 0,
+    },
+    rating_star: {
+      type: Number,
+      default: 0,
+    },
   },
 
   {
